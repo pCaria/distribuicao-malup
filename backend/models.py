@@ -66,7 +66,7 @@ class Orcamento(Base):
     __tablename__ = "orcamento"
 
     id = Column(Integer, primary_key=True, index=True)
-    cliente_id = Column(String(255), ForeignKey("cliente.id"), nullable=False)
+    cliente_id = Column(Integer, ForeignKey("cliente.id"), nullable=False)
     data_orcamento = Column(DateTime, default=datetime.now())
     status = Column(Enum('Pendente', 'Aprovado', 'Recusado', 'Fechado'), default='Pendente', nullable=False)
     data_fechamento = Column(DateTime, nullable=True)
