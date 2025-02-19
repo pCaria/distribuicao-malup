@@ -21,7 +21,7 @@ class Usuario(Base):
     email = Column(String(255), unique=True, nullable=False)
     senha_hash = Column(String(255), nullable=False)
     permissao_id = Column(Integer, ForeignKey("permissao.id"))
-    criado_em = Column(DateTime, default=datetime.datetime.now())
+    criado_em = Column(DateTime, default=datetime.now())
 
     permissao = relationship("Permissao", back_populates="usuarios")
     logs_acesso = relationship("LogAcesso", back_populates="usuario")

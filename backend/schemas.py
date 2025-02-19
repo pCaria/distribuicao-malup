@@ -25,7 +25,8 @@ class UsuarioBase(BaseModel):
     email: EmailStr
 
 class UsuarioCreate(UsuarioBase):
-    senha: str
+    senha_hash: str
+    permissao: Optional[int] = None
 
 class UsuarioOut(UsuarioBase):
     id: int
@@ -51,12 +52,9 @@ class LogAcessoOut(LogAcessoBase):
 # Schemas Cliente
 
 class ClienteBase(BaseModel):
-    id: Optional[int] = None
-    nome: Optional[str] = None
+    nome: str
 
 class ClienteCreate(ClienteBase):
-    id: int
-    nome: str
     email: EmailStr
     telefone: str
     cnpj: str
@@ -65,7 +63,6 @@ class ClienteCreate(ClienteBase):
 
 class ClienteOut(ClienteBase):
     id: int
-    nome: str
     email: EmailStr
     telefone: str
     cnpj: str
@@ -97,14 +94,15 @@ class OrcamentoOut(OrcamentoBase):
 
 class ServicoBase(BaseModel):
     nome: str
-    descricao: Optional[str] = None
+
 
 class ServicoCreate(ServicoBase):
-    pass
+    descricao: Optional[str] = None
 
 
 class ServicoOut(ServicoBase):
     id: int
+    descricao: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -116,11 +114,12 @@ class ProdutoBase(BaseModel):
 
 
 class ProdutoCreate(ProdutoBase):
-    pass
+    descricao: Optional[str] = None
 
 
 class ProdutoOut(ProdutoBase):
     id: int
+    descricao: Optional[str] = None
 
     class Config:
         from_attributes = True
