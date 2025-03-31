@@ -36,6 +36,10 @@ class UsuarioOut(UsuarioBase):
     class Config:
         from_attributes = True
 
+class UsuarioLogin(BaseModel):
+    username: str
+    password: str
+
 # Schemas Log_Acesso
 
 class LogAcessoBase(BaseModel):
@@ -58,7 +62,7 @@ class ClienteCreate(ClienteBase):
     email: EmailStr
     telefone: str
     cnpj: str
-    tipo: str
+    FK_tipo_cliente_ID: int
 
 
 class ClienteOut(ClienteBase):
@@ -66,7 +70,7 @@ class ClienteOut(ClienteBase):
     email: EmailStr
     telefone: str
     cnpj: str
-    tipo: str
+    FK_tipo_cliente_ID: int
 
     class Config:
         from_attributes = True
@@ -74,7 +78,7 @@ class ClienteOut(ClienteBase):
 # Schemas Orcamento
 
 class OrcamentoBase(BaseModel):
-    cliente_id: int
+    FK_cliente_ID: int
 
 
 class OrcamentoCreate(OrcamentoBase):
@@ -127,7 +131,7 @@ class ProdutoOut(ProdutoBase):
 # Schemas Taxa
 
 class TaxaBase(BaseModel):
-    tipo_cliente: str
+    FK_tipo_cliente_ID: int
 
 
 class TaxaOut(TaxaBase):

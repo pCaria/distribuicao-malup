@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from backend.database import Base
+from database import Base
 import enum
 
 class Permissao(Base):
@@ -20,7 +20,7 @@ class Usuario(Base):
     nome = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     senha_hash = Column(String(255), nullable=False)
-    permissao_id = Column(Integer, ForeignKey("permissao.id"))
+    FK_permissao_ID = Column(Integer, ForeignKey("permissao.id"))
     criado_em = Column(DateTime, default=datetime.now())
 
     permissao = relationship("Permissao", back_populates="usuarios")
@@ -31,7 +31,7 @@ class LogAcesso(Base):
     __tablename__ = "log_acesso"
 
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey("usuario.id"))
+    FK_usuario_ID = Column(Integer, ForeignKey("usuario.id"))
     ip = Column(String(45))
     data_hora = Column(DateTime, default=datetime.now())
     acao = Column(String(255))  # Ex: 'Login', 'Alteração de Orçamento'
@@ -39,11 +39,11 @@ class LogAcesso(Base):
     usuario = relationship("Usuario", back_populates="logs_acesso")
 
 # Enum para tipos de clientes
-class TipoClienteEnum(str, enum.Enum):
-    ent_territorio = "ent_territorio"
-    ass_ong = "ass_ong"
-    ent_uni = "ent_uni"
-    proj_aut = "proj_aut"
+class TipoCliente(Base):
+    __tablename__ = 'tipo_cliente'
+
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(50), nullable=False, unique=True)
 
 # Enum para tipos de taxa
 class TipoTaxaEnum(str, enum.Enum):
@@ -51,22 +51,23 @@ class TipoTaxaEnum(str, enum.Enum):
     urgencia = "urgencia"
 
 class Cliente(Base):
-    __tablename__ = "Cliente"
+    __tablename__ = "cliente"
 
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
     telefone = Column(String(20))
     cnpj = Column(String(20))
-    tipo = Column(Enum(TipoClienteEnum), nullable=False)
+    FK_tipo_cliente_ID = Column(Integer, ForeignKey('tipo_cliente.id'), nullable=False)
     
+    tipo_cliente = relationship("TipoCliente")
     orcamentos = relationship("Orcamento", back_populates="cliente")
 
 class Orcamento(Base):
     __tablename__ = "orcamento"
 
     id = Column(Integer, primary_key=True, index=True)
-    cliente_id = Column(Integer, ForeignKey("cliente.id"), nullable=False)
+    FK_cliente_ID = Column(Integer, ForeignKey("cliente.id"), nullable=False)
     data_orcamento = Column(DateTime, default=datetime.now())
     status = Column(Enum('Pendente', 'Aprovado', 'Recusado', 'Fechado'), default='Pendente', nullable=False)
     data_fechamento = Column(DateTime, nullable=True)
@@ -98,8 +99,8 @@ class OrcamentoServico(Base):
     __tablename__ = "orcamento_serviço"
 
     id = Column(Integer, primary_key=True, index=True)
-    orcamento_id = Column(Integer, ForeignKey("orcamento.id"), nullable=False)
-    servico_id = Column(Integer, ForeignKey("serviço.id"), nullable=False)
+    FK_orcamento_ID = Column(Integer, ForeignKey("orcamento.id"), nullable=False)
+    FK_servico_ID = Column(Integer, ForeignKey("serviço.id"), nullable=False)
 
     orcamento = relationship("Orcamento", back_populates="servicos")
     servico = relationship("Servico", back_populates="orcamentos")
@@ -109,18 +110,18 @@ class ServicoProduto(Base):
     __tablename__= "serviço_produto"
 
     id = Column(Integer, primary_key=True, index=True)
-    servico_id = Column(Integer, ForeignKey("serviço.id"), nullable=False)
-    produto_id = Column(Integer, ForeignKey("produto.id"), nullable=False)
+    FK_servico_ID = Column(Integer, ForeignKey("serviço.id"), nullable=False)
+    FK_produto_ID = Column(Integer, ForeignKey("produto.id"), nullable=False)
 
     servico = relationship("Servico", back_populates="produtos")
-    produto = relationship("Produto", back_populates="servicos")
+    produto = relationship("Produto", back_populates="servicos_produto")
 
 class OrcamentoProduto(Base):
     __tablename__ = "orcamento_produto"
 
     id = Column(Integer, primary_key=True, index=True)
-    orcamento_servico_id = Column(Integer, ForeignKey("orcamento_serviço.id"), nullable=False)
-    produto_id = Column(Integer, ForeignKey("produto.id"), nullable=False)
+    FK_orcamento_servico_ID = Column(Integer, ForeignKey("orcamento_serviço.id"), nullable=False)
+    FK_produto_ID = Column(Integer, ForeignKey("produto.id"), nullable=False)
     quantidade = Column(Integer, nullable=False)
     preco_unitario = Column(Float, nullable=False)
     desconto = Column(Float, default=0.0)
@@ -133,10 +134,11 @@ class ValorProduto(Base):
     __tablename__ = "valor_produto"
 
     id = Column(Integer, primary_key=True, index=True)
-    produto_id = Column(Integer, ForeignKey("produto.id"), nullable=False)
-    tipo_cliente = Column(Enum(TipoClienteEnum), nullable=False)
+    FK_produto_ID = Column(Integer, ForeignKey("produto.id"), nullable=False)
+    FK_tipo_cliente_ID = Column(Integer, ForeignKey('tipo_cliente.id'), nullable=False)
     preco = Column(Float, nullable=False)
 
+    tipo_cliente = relationship("TipoCliente")
     produto = relationship("Produto", back_populates="precos")
 
 # Modelo para armazenar os valores das taxas por tipo de cliente
@@ -144,8 +146,9 @@ class TaxaValor(Base):
     __tablename__ = "taxa_valor"
 
     id = Column(Integer, primary_key=True, index=True)
-    tipo_cliente = Column(Enum(TipoClienteEnum), nullable=False)
+    FK_tipo_cliente_ID = Column(Integer, ForeignKey('tipo_cliente.id'), nullable=False)
     tipo_taxa = Column(Enum(TipoTaxaEnum), nullable=False)
     valor = Column(Float, nullable=False)  # Pode ser percentual ou fixo dependendo da lógica
 
+    tipo_cliente = relationship("TipoCliente")
     
