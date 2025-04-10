@@ -13,7 +13,7 @@ const NavbarLink = ({ to, icon, label }: NavbarLinkProps) => {
         to={to}
         className="flex w-full justify-center hover:bg-gray-900 rounded"
       >
-        <span className="flex w-max font-bold">{label}</span>
+        <span className="flex w-max font-bold px-3 py-1">{label}</span>
       </Link>
     </li>
   );
